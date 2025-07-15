@@ -1,4 +1,5 @@
-import { ChevronDown, LogOut } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronDown, LogOut, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -8,13 +9,20 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import ConfirmDialog from './ConfirmDialog';
 
 const UserDropdown = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, deleteAccount } = useAuth();
   const navigate = useNavigate();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleLogout = () => {
     logout();
+    navigate('/login');
+  };
+
+  const handleDeleteAccount = () => {
+    deleteAccount();
     navigate('/login');
   };
 
@@ -36,7 +44,19 @@ const UserDropdown = () => {
           <LogOut className="w-4 h-4 mr-2" />
           Log Out
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} className="cursor-pointer text-destructive">
+          <Trash2 className="w-4 h-4 mr-2" />
+          Delete Account
+        </DropdownMenuItem>
       </DropdownMenuContent>
+      
+      <ConfirmDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Delete Account"
+        description="Are you sure you want to delete your account? This action cannot be undone."
+        onConfirm={handleDeleteAccount}
+      />
     </DropdownMenu>
   );
 };

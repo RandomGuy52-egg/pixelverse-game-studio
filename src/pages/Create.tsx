@@ -7,8 +7,9 @@ import UserDropdown from '@/components/UserDropdown';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Create = () => {
-  const { user } = useAuth();
+  const { user, getPublishedGames } = useAuth();
   const navigate = useNavigate();
+  const publishedGames = getPublishedGames();
 
   return (
     <div className="min-h-screen bg-background">

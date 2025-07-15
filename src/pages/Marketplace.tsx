@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 const Marketplace = () => {
-  const { user, updateCurrency } = useAuth();
+  const { user, updateCurrency, purchaseItem } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -24,8 +24,18 @@ const Marketplace = () => {
   const handlePurchase = (item: typeof items[0]) => {
     if (!user) return;
     
+    if (user.ownedItems.includes(item.id.toString())) {
+      toast({
+        title: "Already Owned",
+        description: `You already own ${item.name}.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (user.currency >= item.price) {
       updateCurrency(-item.price);
+      purchaseItem(item.id.toString());
       toast({
         title: "Purchase Successful!",
         description: `You bought ${item.name} for ${item.price} coins.`,
@@ -104,13 +114,23 @@ const Marketplace = () => {
                   <Coins className="w-5 h-5 text-primary" />
                   <span className="text-lg font-bold text-foreground">{item.price}</span>
                 </div>
-                <Button 
-                  onClick={() => handlePurchase(item)}
-                  disabled={!user || user.currency < item.price}
-                  className="w-full"
-                >
-                  Buy Now
-                </Button>
+                {user?.ownedItems.includes(item.id.toString()) ? (
+                  <Button 
+                    disabled
+                    className="w-full"
+                    variant="secondary"
+                  >
+                    Owned
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={() => handlePurchase(item)}
+                    disabled={!user || user.currency < item.price}
+                    className="w-full"
+                  >
+                    Buy Now
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))}
